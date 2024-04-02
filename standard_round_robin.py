@@ -1,4 +1,4 @@
-def round_robin(processes, time_quantum):
+def constant_round_robin(processes, time_quantum):
     ready_queue = []  # Queue to hold ready processes
     turnaround_time = [0] * len(processes)  # Time from submission to completion
     waiting_time = [0] * len(processes)  # Time spent waiting in ready queue
@@ -43,15 +43,21 @@ def round_robin(processes, time_quantum):
     avg_response_time = sum(response_time) / len(processes)
 
     return avg_turnaround_time, avg_waiting_time, avg_response_time, context_switches
-processes = [
-    (0, 0, 6),  # (Process ID, Arrival Time, Burst Time)
-    (1, 0, 8),
-    (2, 10, 7),
-    (3, 4, 3)
-]
-time_quantum = 4.5
-avg_turnaround_time, avg_waiting_time, avg_response_time,context_swiches = round_robin(processes, time_quantum)
-print("Average Turnaround Time:", avg_turnaround_time)
-print("Average Waiting Time:", avg_waiting_time)
-print("Average Response Time:", avg_response_time)
-print('Number of context switches:', context_swiches)
+# processes,burst_time_array,arrival_time_array = sampling_process(
+#     10,4,0,0,10
+# )
+# import numpy as np
+# time_quantum = np.median(burst_time_array)
+# avg_turnaround_time, avg_waiting_time, avg_response_time,context_swiches = round_robin(processes, time_quantum)
+# print("Median time quantum")
+# print("Average Turnaround Time:", avg_turnaround_time)
+# print("Average Waiting Time:", avg_waiting_time)
+# print("Average Response Time:", avg_response_time)
+# print('Number of context switches:', context_swiches)
+# print("Mean time_quantum")
+# time_quantum = (np.max(burst_time_array)-np.min(burst_time_array))/2
+# avg_turnaround_time, avg_waiting_time, avg_response_time,context_swiches = round_robin(processes, time_quantum)
+# print("Average Turnaround Time:", avg_turnaround_time)
+# print("Average Waiting Time:", avg_waiting_time)
+# print("Average Response Time:", avg_response_time)
+# print('Number of context switches:', context_swiches)
