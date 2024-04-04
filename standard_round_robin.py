@@ -1,3 +1,4 @@
+import numpy as np
 def constant_round_robin(processes, time_quantum):
     ready_queue = []  # Queue to hold ready processes
     turnaround_time = [0] * len(processes)  # Time from submission to completion
@@ -41,8 +42,7 @@ def constant_round_robin(processes, time_quantum):
     avg_turnaround_time = sum(turnaround_time) / len(processes)
     avg_waiting_time = sum(waiting_time) / len(processes)
     avg_response_time = sum(response_time) / len(processes)
-
-    return avg_turnaround_time, avg_waiting_time, avg_response_time, context_switches
+    return avg_turnaround_time, avg_waiting_time, avg_response_time, context_switches,np.var(np.array(response_time))
 
 if __name__ == "__main__":
     import random

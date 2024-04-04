@@ -17,9 +17,10 @@ processes,burst_time_array,arrival_time_array = sampling_process(
 for method in METHOD_ZOO:
     cal_quantum,round_robin = METHOD_ZOO[method]
     quantum_time = cal_quantum(burst_time_array)
-    avg_turnaround_time, avg_waiting_time, avg_response_time,context_swiches = round_robin(processes, quantum_time)
+    avg_turnaround_time, avg_waiting_time, avg_response_time,context_swiches,var_response = round_robin(processes, quantum_time)
     print(method+ ' method:')
     print("Average Turnaround Time:", avg_turnaround_time)
     print("Average Waiting Time:", avg_waiting_time)
     print("Average Response Time:", avg_response_time)
+    print("Variance Response Time:",var_response)
     print('Number of context switches:', context_swiches)
