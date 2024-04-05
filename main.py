@@ -1,6 +1,13 @@
 from sampling import sampling_process
 from standard_round_robin import constant_round_robin
 from cal_quantum import *
+
+import time
+import csv
+
+np.random.seed(int(time.time()))
+
+
 METHOD_ZOO = {
     'median_burst':(median_burst,constant_round_robin),
     'average_burst':(average_burst,constant_round_robin),
@@ -11,16 +18,87 @@ METHOD_ZOO = {
     'average_median_max':(average_median_max,constant_round_robin),
     'sqrt_median_max':(sqrt_median_max,constant_round_robin)
 }
-processes,burst_time_array,arrival_time_array = sampling_process(
-    10,4,0,0,10
-)
+
+
+
+DATA_LIST ={
+    'avg_turnaround_time' : [],
+    'avg_waiting_time' : [],
+    'avg_response_time' : [],
+    'context_swiches' : []
+}
+
+
+
+field_names =[]
+
+Number_of_Process = 10
+
+for i in range(Number_of_Process):
+    field_names.append('P'+ str(i+1))
+
+print(field_names)
+
+mydata = []
+
+for i in range(Number_of_Process):
+    #time.sleep(0.5)
+    processes,burst_time_array,arrival_time_array,new_row = sampling_process(
+        np.random.randint(1,3),np.random.randint(1,2),0,0,Number_of_Process,field_names
+    )
+    ROW = {
+        'avg_turnaround_time' : new_row.copy(),
+        'avg_waiting_time' : new_row.copy(),
+        'avg_response_time' : new_row.copy(),
+        'context_swiches' : new_row.copy()
+    }
+    for method in METHOD_ZOO:
+        cal_quantum,round_robin = METHOD_ZOO[method]
+        quantum_time = np.int32(cal_quantum(burst_time_array))
+        avg_turnaround_time, avg_waiting_time, avg_response_time,context_swiches = round_robin(processes, quantum_time)
+        ROW['avg_turnaround_time'].update({method : avg_turnaround_time})
+        ROW['avg_waiting_time'].update({method : avg_waiting_time})
+        ROW['avg_response_time'].update({method : avg_response_time})
+        ROW['context_swiches'].update({method : context_swiches})
+
+        new_row.update({method : (avg_turnaround_time,avg_waiting_time,avg_response_time,context_swiches)})
+        #print(method+ ' method:')
+        #print("Average Turnaround Time:", avg_turnaround_time)
+        #print("Average Waiting Time:", avg_waiting_time)
+        #print("Average Response Time:", avg_response_time)
+        #print('Number of context switches:', context_swiches)
+        mydata.append(new_row)
+    for factor in DATA_LIST:
+        DATA_LIST[factor].append(ROW[factor])
+
+
 for method in METHOD_ZOO:
-    cal_quantum,round_robin = METHOD_ZOO[method]
-    quantum_time = cal_quantum(burst_time_array)
-    avg_turnaround_time, avg_waiting_time, avg_response_time,context_swiches,var_response = round_robin(processes, quantum_time)
-    print(method+ ' method:')
-    print("Average Turnaround Time:", avg_turnaround_time)
-    print("Average Waiting Time:", avg_waiting_time)
-    print("Average Response Time:", avg_response_time)
-    print("Variance Response Time:",var_response)
-    print('Number of context switches:', context_swiches)
+    field_names.append(method)
+
+
+
+
+
+for factor in DATA_LIST:
+    file_path = factor+'_'+str(Number_of_Process)+'processes' + '.csv'
+    with open(file_path, 'w', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=field_names)
+    
+        # Write header
+        writer.writeheader()
+    
+        # Write rows
+        for row in DATA_LIST[factor]:
+            writer.writerow(row)
+
+csv_file_path = 'all.csv'
+
+with open(csv_file_path, 'w', newline='') as csvfile:
+    writer = csv.DictWriter(csvfile, field_names)
+    
+    # Write header
+    writer.writeheader()
+    
+    # Write rows
+    for row in mydata:
+        writer.writerow(row)
