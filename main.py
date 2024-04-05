@@ -25,7 +25,8 @@ DATA_LIST ={
     'avg_turnaround_time' : [],
     'avg_waiting_time' : [],
     'avg_response_time' : [],
-    'context_swiches' : []
+    'context_swiches' : [],
+    'response_time_var' : []
 }
 
 
@@ -37,7 +38,6 @@ Number_of_Process = 10
 for i in range(Number_of_Process):
     field_names.append('P'+ str(i+1))
 
-print(field_names)
 
 mydata = []
 
@@ -50,18 +50,20 @@ for i in range(Number_of_Process):
         'avg_turnaround_time' : new_row.copy(),
         'avg_waiting_time' : new_row.copy(),
         'avg_response_time' : new_row.copy(),
-        'context_swiches' : new_row.copy()
+        'context_swiches' : new_row.copy(),
+        'response_time_var' : new_row.copy()
     }
     for method in METHOD_ZOO:
         cal_quantum,round_robin = METHOD_ZOO[method]
         quantum_time = np.int32(cal_quantum(burst_time_array))
-        avg_turnaround_time, avg_waiting_time, avg_response_time,context_swiches = round_robin(processes, quantum_time)
+        avg_turnaround_time, avg_waiting_time, avg_response_time,context_swiches,response_time_var = constant_round_robin(processes,quantum_time)
         ROW['avg_turnaround_time'].update({method : avg_turnaround_time})
         ROW['avg_waiting_time'].update({method : avg_waiting_time})
         ROW['avg_response_time'].update({method : avg_response_time})
         ROW['context_swiches'].update({method : context_swiches})
+        ROW['response_time_var'].update({method : response_time_var})
 
-        new_row.update({method : (avg_turnaround_time,avg_waiting_time,avg_response_time,context_swiches)})
+        new_row.update({method : (avg_turnaround_time,avg_waiting_time,avg_response_time,context_swiches,response_time_var)})
         #print(method+ ' method:')
         #print("Average Turnaround Time:", avg_turnaround_time)
         #print("Average Waiting Time:", avg_waiting_time)

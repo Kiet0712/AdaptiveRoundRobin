@@ -7,11 +7,12 @@ def sampling_process(
         std_burst_time: float,
         mean_arrival_time: float,
         std_arrival_time: float,
-        num_process: int
+        num_process: int,
+        field_names: list
     ) -> list[tuple]:
-    burst_time_array = np.exp(np.int32(np.random.normal(loc=mean_burst_time,scale=std_burst_time,size=num_process)))
-    arrival_time_array = np.exp(np.int32(np.random.normal(loc=mean_arrival_time,scale=std_arrival_time,size=num_process)))
+    burst_time_array = np.int32(np.exp(np.random.normal(loc=mean_burst_time,scale=std_burst_time,size=num_process)))
+    arrival_time_array = np.int32(np.exp(np.random.normal(loc=mean_arrival_time,scale=std_arrival_time,size=num_process)))
     result_sampling = []
     for i in range(num_process):
         result_sampling.append((i,arrival_time_array[i],burst_time_array[i]))
-    return result_sampling,burst_time_array,arrival_time_array
+    return result_sampling,burst_time_array,arrival_time_array,dict(zip(field_names,burst_time_array)) 
