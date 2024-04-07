@@ -82,14 +82,14 @@ for i in range(NUMBER_OF_DATA_POINT):
         #write data information
         with open('process_information.csv','a') as file:
             writer = csv.writer(file)
-            writer.writerow('Test' + str(i)+':')
+            writer.writerow(['Test' + str(i)+':'])
         data = {'Processes' : field_names ,'Burst time':burst_time_array , 'Arrival time':arrival_time_array}
         data = pd.DataFrame(data)
         data.to_csv('process_information.csv',mode='a',header=True,index=False)
 
         with open('process_information.csv','a') as file:
             writer = csv.writer(file)
-            writer.writerow('---------------------------')
+            writer.writerow(['---------------------------'])
 
     for factor in DATA_LIST:
         DATA_LIST[factor].append(ROW[factor])
