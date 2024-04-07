@@ -1,7 +1,8 @@
 from sampling import sampling_process
 from standard_round_robin import constant_round_robin
 from cal_quantum import *
-import matplotlib.pyplot as plt
+from plot import plot_result
+
 METHOD_ZOO = {
     'median':(median_burst,constant_round_robin),
     'average':(average_burst,constant_round_robin),
@@ -29,37 +30,18 @@ plotData = {
 for method in METHOD_ZOO:
     cal_quantum,round_robin = METHOD_ZOO[method]
     quantum_time = cal_quantum(burst_time_array)
-    avg_turnaround_time, avg_waiting_time, avg_response_time,context_swiches,var_response = round_robin(processes, quantum_time)
+    avg_turnaround_time, avg_waiting_time, avg_response_time, context_switches, var_response = round_robin(processes, quantum_time)
     print(method+ ' method:')
     print("Average Turnaround Time:", avg_turnaround_time)
     print("Average Waiting Time:", avg_waiting_time)
     print("Average Response Time:", avg_response_time)
     print("Variance Response Time:",var_response)
-    print('Number of context switches:', context_swiches)
+    print('Number of context switches:', context_switches)
 
     plotData['Average_Turnaround'][method] = avg_turnaround_time
     plotData['Average_Waiting'][method] = avg_waiting_time
     plotData['Average_Response'][method] = avg_response_time
     plotData['Variance_Response'][method] = var_response
-    plotData['Number_of_context_switches'][method] = context_swiches
+    plotData['Number_of_context_switches'][method] = context_switches
 
-
-fig, axes = plt.subplots(5, 1)
-i = 0
-for metric in plotData:
-    #axes[i].set_xticks(range(len(plotData[metric].keys())), plotData[metric].keys(), rotation=90)
-    #axes[i].bar(range(len(plotData[metric].keys())), plotData[metric].values())
-    axes[i].bar(range(len(plotData[metric].keys())), plotData[metric].values())
-    axes[i].title.set_text(metric)
-    if i==4:
-        break
-    axes[i].tick_params(
-            axis='x',          # changes apply to the x-axis
-            which='both',      # both major and minor ticks are affected
-            bottom=False,      # ticks along the bottom edge are off
-            top=False,         # ticks along the top edge are off
-            labelbottom=False
-        ) 
-    i += 1  
-axes[4].set_xticks(range(len(plotData[metric].keys())), plotData[metric].keys(), rotation=90)
-plt.show()
+plot_result(plotData)
