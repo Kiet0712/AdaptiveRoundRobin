@@ -52,7 +52,6 @@ for i in range(NUMBER_OF_DATA_POINT):
         np.random.randint(1,3),np.random.randint(1,2),np.random.randint(1,3),np.random.randint(0,10),Number_of_Process
     )
     new_row = dict(zip(field_names,list(zip(burst_time_array,arrival_time_array))))
-    print(new_row)
     ROW = {
         'avg_turnaround_time' : new_row.copy(),
         'avg_waiting_time' : new_row.copy(),
@@ -81,9 +80,16 @@ for i in range(NUMBER_OF_DATA_POINT):
 
 
         #write data information
+        with open('process_information.csv','a') as file:
+            writer = csv.writer(file)
+            writer.writerow('Test' + str(i)+':')
         data = {'Processes' : field_names ,'Burst time':burst_time_array , 'Arrival time':arrival_time_array}
         data = pd.DataFrame(data)
         data.to_csv('process_information.csv',mode='a',header=True,index=False)
+
+        with open('process_information.csv','a') as file:
+            writer = csv.writer(file)
+            writer.writerow('---------------------------')
 
     for factor in DATA_LIST:
         DATA_LIST[factor].append(ROW[factor])
