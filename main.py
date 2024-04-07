@@ -1,12 +1,14 @@
 from sampling import sampling_process
 from standard_round_robin import constant_round_robin
 from cal_quantum import *
-
+import pandas as pd
 import time
 import csv
 
 np.random.seed(int(time.time()))
 
+with open('process_information.csv','w') as file:
+    pass
 
 METHOD_ZOO = {
     'median_burst':(median_burst,constant_round_robin),
@@ -18,6 +20,7 @@ METHOD_ZOO = {
     'average_median_max':(average_median_max,constant_round_robin),
     'sqrt_median_max':(sqrt_median_max,constant_round_robin)
 }
+
 
 
 
@@ -39,13 +42,17 @@ for i in range(Number_of_Process):
     field_names.append('P'+ str(i+1))
 
 
+NUMBER_OF_DATA_POINT = 10
+
 mydata = []
 
-for i in range(Number_of_Process):
+for i in range(NUMBER_OF_DATA_POINT):
     #time.sleep(0.5)
-    processes,burst_time_array,arrival_time_array,new_row = sampling_process(
-        np.random.randint(1,3),np.random.randint(1,2),0,0,Number_of_Process,field_names
+    processes,burst_time_array,arrival_time_array = sampling_process(
+        np.random.randint(1,3),np.random.randint(1,2),np.random.randint(1,3),np.random.randint(0,10),Number_of_Process
     )
+    new_row = dict(zip(field_names,list(zip(burst_time_array,arrival_time_array))))
+    print(new_row)
     ROW = {
         'avg_turnaround_time' : new_row.copy(),
         'avg_waiting_time' : new_row.copy(),
@@ -70,6 +77,14 @@ for i in range(Number_of_Process):
         #print("Average Response Time:", avg_response_time)
         #print('Number of context switches:', context_swiches)
         mydata.append(new_row)
+
+
+
+        #write data information
+        data = {'Processes' : field_names ,'Burst time':burst_time_array , 'Arrival time':arrival_time_array}
+        data = pd.DataFrame(data)
+        data.to_csv('process_information.csv',mode='a',header=True,index=False)
+
     for factor in DATA_LIST:
         DATA_LIST[factor].append(ROW[factor])
 
@@ -85,7 +100,6 @@ for factor in DATA_LIST:
     file_path = factor+'_'+str(Number_of_Process)+'processes' + '.csv'
     with open(file_path, 'w', newline='') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=field_names)
-    
         # Write header
         writer.writeheader()
     
