@@ -75,7 +75,7 @@ for i in range(NUMBER_OF_DATA_POINT):
         #print("Average Waiting Time:", avg_waiting_time)
         #print("Average Response Time:", avg_response_time)
         #print('Number of context switches:', context_swiches)
-        mydata.append(new_row)
+    mydata.append(new_row)
 
 
 
