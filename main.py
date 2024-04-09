@@ -11,10 +11,13 @@ METHOD_ZOO = {
     'average\nmedian':(average_median_burst,constant_round_robin),
     'sqrt_average\nmedian':(sqrt_average_median_burst,constant_round_robin),
     'average\nmedian_max':(average_median_max,constant_round_robin),
-    'sqrt\nmedian_max':(sqrt_median_max,constant_round_robin)
+    'sqrt\nmedian_max':(sqrt_median_max,constant_round_robin),
+    'minmax\ndispersion':(min_max_dispersion,constant_round_robin),
+    'harmonic\nmean': (harmonic_mean,constant_round_robin),
+    'double\nmedian':(double_median,constant_round_robin)
 }
 processes,burst_time_array,arrival_time_array = sampling_process(
-    10,4,0,0,10
+    100,40,20,3,10
 )
 
 
@@ -29,7 +32,7 @@ plotData = {
 
 for method in METHOD_ZOO:
     cal_quantum,round_robin = METHOD_ZOO[method]
-    quantum_time = cal_quantum(burst_time_array)
+    quantum_time = np.int32(cal_quantum(burst_time_array))
     avg_turnaround_time, avg_waiting_time, avg_response_time, context_switches, var_response = round_robin(processes, quantum_time)
     print(method+ ' method:')
     print("Average Turnaround Time:", avg_turnaround_time)

@@ -21,3 +21,5 @@ def min_max_dispersion(burst_time_array: np.ndarray):
     return np.max(burst_time_array)-np.min(burst_time_array)
 def harmonic_mean(burst_time_array: np.ndarray):
     return hmean(burst_time_array)
+def double_median(bust_time_array: np.ndarray):
+    return np.median(bust_time_array)*2
