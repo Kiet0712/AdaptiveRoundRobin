@@ -1,0 +1,9 @@
+Miêu tả sample:
+- Mỗi sample là một dictionary bao gồm
+    + binary_mask: một binary vector 5 chiều
+    + process list: biểu diễn ở dạng list các tuple (tuple 2 phần tử là burst time và arrival time), cái list này sẽ không có độ dài cố định cho từng sample
+    + label: giá trị của thằng này sẽ tùy thuộc vào binary_mask và process_list. Để lấy giá trị của thằng này cần 2 bước:
+        Bước 1: Chạy process_list trên 11 method tính quantum time của main
+        Bước 2: Gán giá trị cho label tùy vào giá trị của binary_mask
+            Công thức: value = np.sum(np.array(5 metric) * np.array(binary_mask))/np.sum(binary_mask)
+            Value của method nào nhỏ nhất thì label bằng tên method đó.
