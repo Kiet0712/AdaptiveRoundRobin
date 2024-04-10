@@ -44,33 +44,3 @@ def constant_round_robin(processes, time_quantum):
     avg_response_time = sum(response_time) / len(processes)
     return avg_turnaround_time, avg_waiting_time, avg_response_time, context_switches,np.var(np.array(response_time))
 
-if __name__ == "__main__":
-    import random
-    import matplotlib.pyplot as plt
-    ans = [[],[],[],[]]
-    random.seed(123)
-    processes = []
-    MIN_BURST_TIME = 1_000
-    MAX_BURST_TIME = 100_000
-    for i in range(100):
-        processes.append((i, 0, random.randint(MIN_BURST_TIME, MAX_BURST_TIME)))
-    for i in range(MIN_BURST_TIME, MAX_BURST_TIME+1, 100):
-        x = constant_round_robin(
-            processes,
-            i
-        )
-        ans[0].append(x[0])
-        ans[1].append(x[1])
-        ans[2].append(x[2])
-        ans[3].append(x[3])
-
-    fig, axes = plt.subplots(2, 2) 
-    axes[0, 0].plot(ans[0], color='red')
-    axes[0, 0].title.set_text('Turnaround')
-    axes[0, 1].plot(ans[1], color='green')
-    axes[0, 1].title.set_text('Waiting')
-    axes[1, 0].plot(ans[2], color='blue')
-    axes[1, 0].title.set_text('Response')
-    axes[1, 1].plot(ans[3], color='orange')
-    axes[1, 1].title.set_text('Context switch')
-    plt.show()
