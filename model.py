@@ -1,7 +1,23 @@
 import torch
 import torch.nn as nn
 import math
+def positionalencoding1d(d_model, length):
+    """
+    :param d_model: dimension of the model
+    :param length: length of positions
+    :return: length*d_model position matrix
+    """
+    if d_model % 2 != 0:
+        raise ValueError("Cannot use sin/cos positional encoding with "
+                         "odd dim (got dim={:d})".format(d_model))
+    pe = torch.zeros(length, d_model)
+    position = torch.arange(0, length).unsqueeze(1)
+    div_term = torch.exp((torch.arange(0, d_model, 2, dtype=torch.float) *
+                         -(math.log(10000.0) / d_model)))
+    pe[:, 0::2] = torch.sin(position.float() * div_term)
+    pe[:, 1::2] = torch.cos(position.float() * div_term)
 
+    return pe    
 class MultiHeadAttention(nn.Module):
 
     def __init__(self, d_model, n_head):
@@ -175,14 +191,15 @@ class Model(nn.Module):
             self.encoder_layer.append(EncoderLayer(d_model,d_model*2,n_head,drop_prob))
         self.cls_token = nn.Parameter(torch.ones(d_model),requires_grad=True)
         self.n_encoder = n_encoder
+        self.d_model = d_model
         self.cls_predict = PositionwiseFeedForward(d_model,d_model*2,drop_prob,n_class)
     def forward(self,x,bin_mask):
         # x: (N,L,2)
         # bin_mask: (N,5,1)
-        N,_,_ = x.shape
+        N,L,_ = x.shape
         embedding = self.input_embedd(x,bin_mask)
         embedding_add_cls_token = torch.cat((embedding,self.cls_token.unsqueeze(0).unsqueeze(0).repeat(N,1,1)),dim=1)
-        encode_data = embedding_add_cls_token
+        encode_data = embedding_add_cls_token + positionalencoding1d(self.d_model,L+6).unsqueeze(0).to(embedding_add_cls_token.device)
         for i in range(self.n_encoder):
             encode_data = self.encoder_layer[i](encode_data,None)
 
