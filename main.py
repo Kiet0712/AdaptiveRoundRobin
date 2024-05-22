@@ -38,7 +38,7 @@ DATA_TRAIN_N2 = []
 
 for i in range(N1):
     sample ={}
-    bit_masks = []
+    #bit_masks = []
     while 1:
             bit_mask = [random.uniform(0,1) for _ in range(5)]
             if np.sum(bit_mask) == 0:
@@ -46,7 +46,7 @@ for i in range(N1):
             else:
                  break
     processes,burst_time_array,arrival_time_array = sampling_process(
-    50,100,0,10,random.randint(3,20)
+    30,100,0,5,random.randint(3,20)
     )
     if i!=0 and random.uniform(0,1)>0.5:
          processes,burst_time_array,arrival_time_array = cache_process,cache_burst_time_array,cache_arrival_time_array
@@ -66,8 +66,11 @@ for i in range(N1):
 
 
 
-
     min_key = min(data, key=data.get)
+    if min_key not in COUNT:
+      COUNT[min_key]=1
+    else:
+      COUNT[min_key]+=1
     sample.update({'process' :process})
     sample.update({'label' : min_key})
     sample.update({'binary mask': bit_mask})
@@ -76,7 +79,7 @@ for i in range(N1):
 
 for i in range(N2):
     sample ={}
-    bit_masks = []
+    #bit_masks = []
     while 1:
             bit_mask = [random.uniform(0,1) for _ in range(5)]
             if np.sum(bit_mask) == 0:
@@ -84,7 +87,7 @@ for i in range(N2):
             else:
                  break
     processes,burst_time_array,arrival_time_array = sampling_process(
-    50,100,0,10,random.randint(3,20)
+    30,100,0,5,random.randint(3,20)
     )
     if i!=0 and random.uniform(0,1)>0.5:
          processes,burst_time_array,arrival_time_array = cache_process,cache_burst_time_array,cache_arrival_time_array
@@ -111,9 +114,9 @@ for i in range(N2):
     sample.update({'binary mask': bit_mask})
 
     DATA_TRAIN_N2.append(sample)
-NUM_EPOCH = 40
-D_MODEL = 8
-N_HEAD = 2
+NUM_EPOCH = 10
+D_MODEL = 32
+N_HEAD = 4
 DROP_PROB = 0.1
 N_ENCODER = 1
 N_CLASS = len(METHOD_ZOO)
@@ -135,6 +138,7 @@ optimizer = torch.optim.Adam(
 )
 criterion = nn.CrossEntropyLoss()
 mapping_N1 = list(range(N1))
+
 for epoch in range(NUM_EPOCH):
   running_loss = 0.0
   print('Epoch ' + str(epoch+1)+ ':')
@@ -142,7 +146,7 @@ for epoch in range(NUM_EPOCH):
   for i in range(N1):
     optimizer.zero_grad()
     data_i = DATA_TRAIN_N1[mapping_N1[i]]
-    x = torch.tensor(np.expand_dims((np.array(data_i['process'])-np.array([[50,0]]))/np.array([[50,10]]),0)).float().to(device)
+    x = torch.tensor(np.expand_dims(np.array(data_i['process']),0)).float().to(device)
     bin_mask = torch.tensor(np.array(data_i['binary mask'])).unsqueeze(0).unsqueeze(-1).float().to(device)
     output = model(x,bin_mask)
     label = torch.tensor(METHODMAPPING[data_i['label']]).unsqueeze(0).to(device)
@@ -154,17 +158,20 @@ for epoch in range(NUM_EPOCH):
       print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 2000:.3f}')
       running_loss = 0.0
   num_correct = 0
-  start =time.time()
+  run_time = 0
   with torch.inference_mode():
     for i in range(N2):
       data_i = DATA_TRAIN_N2[i]
-      x = torch.tensor(np.expand_dims((np.array(data_i['process'])-np.array([[50,0]]))/np.array([[50,10]]),0)).float().to(device)
+      x = torch.tensor(np.expand_dims(np.array(data_i['process']),0)).float().to(device)
       bin_mask = torch.tensor(np.array(data_i['binary mask'])).unsqueeze(0).unsqueeze(-1).float().to(device)
+      start = time.time()
       output = model(x,bin_mask)
+      end = time.time()
+      run_time+=end-start
       predict = torch.argmax(output,dim=-1)
       label = torch.tensor(METHODMAPPING[data_i['label']]).to(device)
       if label==predict:
         num_correct+=1
-  end = time.time()
   print('Val acc = ' + str(num_correct/N2))
-  print(end-start)
+  print(run_time)
+torch.save(model, 'train.pth')
