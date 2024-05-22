@@ -1,5 +1,0 @@
-1 Visualize result (Minh)
-2 Experiment with constant quantum time for different mean and std (no arrival time and arrival time) (Kiên)
-3 Calculate quantum time for constant round robin by both burst time and arrival_time (Minh)
-4 Self Adjustment #https://www.ijcaonline.org/volume5/number5/pxc3871291.pdf #https://thescipub.com/pdf/ajassp.2009.1831.1837.pdf
-5 Neural Network
