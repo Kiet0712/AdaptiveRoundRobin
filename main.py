@@ -20,6 +20,9 @@ METHOD_ZOO = {
     'harmonic\nmean': (harmonic_mean,constant_round_robin),
     'double\nmedian':(double_median,constant_round_robin)
 }
+COUNT = {
+
+}
 METHODMAPPING = {
 
 }
@@ -76,7 +79,23 @@ for i in range(N1):
     sample.update({'binary mask': bit_mask})
 
     DATA_TRAIN_N1.append(sample)
-
+import matplotlib.pyplot as plt
+def plot(count,dataset):
+    fig, ax1 = plt.subplots(1, 1,figsize=(12,6))
+    method = [key for key in count]
+    count_method = [count[key] for key in count]
+    y_pos = np.arange(len(method))
+    ax1.barh(y_pos,count_method,align='center')
+    ax1.set_yticks(y_pos, labels=method)
+    ax1.invert_yaxis()
+    ax1.set_xlabel('count')
+    ax1.set_ylabel('method')
+    ax1.set_title(dataset + ' bar chart')
+    #ax2.pie(count_method,labels=method, autopct="%1.1f%%")
+    #ax2.set_title(dataset + ' pie chart')
+    plt.show()
+print(COUNT)
+plot(COUNT,'train dataset')
 for i in range(N2):
     sample ={}
     #bit_masks = []
