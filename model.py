@@ -209,8 +209,12 @@ class Model(nn.Module):
             encode_data+=positionalencoding1d(self.d_model,L+6).unsqueeze(0).to(embedding_add_cls_token.device)
         for i in range(self.n_encoder):
             encode_data = self.encoder_layer[i](encode_data,None)
-
-        return self.cls_predict(encode_data[:,-1])
+        if cfg.LAST_CLS_TOKEN:
+            cls_token = encode_data[:,-1]
+        else:
+            cls_token = encode_data[:,embedding.shape[1]//2]
+        
+        return self.cls_predict(cls_token)
 
         
 
