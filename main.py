@@ -30,13 +30,11 @@ for key in METHOD_ZOO:
 cache_process = None
 cache_burst_time_array = None
 cache_arrival_time_array = None
-N1 = 18000
+N1 = 19000
 N2 = 1000
-N3 = 1000
 
 DATA_TRAIN_N1 = []
 DATA_TRAIN_N2 = []
-DATA_TRAIN_N3 = []
 
 for i in range(N1):
     sample ={}
@@ -113,45 +111,6 @@ for i in range(N2):
     sample.update({'binary mask': bit_mask})
 
     DATA_TRAIN_N2.append(sample)
-
-
-for i in range(N3):
-    sample ={}
-    bit_masks = []
-    while 1:
-            bit_mask = [random.uniform(0,1) for _ in range(5)]
-            if np.sum(bit_mask) == 0:
-                 continue
-            else:
-                 break
-    processes,burst_time_array,arrival_time_array = sampling_process(
-    50,100,0,10,random.randint(3,20)
-    )
-    if i!=0 and random.uniform(0,1)>0.5:
-         processes,burst_time_array,arrival_time_array = cache_process,cache_burst_time_array,cache_arrival_time_array
-    #proccess : list of tuple of burst time and arrival time
-    cache_process,cache_burst_time_array,cache_arrival_time_array = processes,burst_time_array,arrival_time_array
-    process = list(zip(burst_time_array,arrival_time_array))
-    data = {}
-    for method in METHOD_ZOO:
-
-        cal_quantum,round_robin = METHOD_ZOO[method]
-        quantum_time = np.int32(cal_quantum(burst_time_array))
-        #print(process,quantum_time,method)
-        avg_turnaround_time, avg_waiting_time, avg_response_time, context_switches, var_response = round_robin(processes, quantum_time)
-        metrics = [avg_turnaround_time,avg_waiting_time,avg_response_time,context_switches,var_response]
-        value = np.sum(np.array(metrics)*np.array(bit_mask))/np.sum(bit_mask)
-        data.update({method : value})
-
-
-
-
-    min_key = min(data, key=data.get)
-    sample.update({'process' :process})
-    sample.update({'label' : min_key})
-    sample.update({'binary mask': bit_mask})
-
-    DATA_TRAIN_N3.append(sample)
 NUM_EPOCH = 40
 D_MODEL = 8
 N_HEAD = 2
