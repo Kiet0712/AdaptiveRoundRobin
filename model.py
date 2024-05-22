@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import math
+from defaults import _C as cfg
 def positionalencoding1d(d_model, length):
     """
     :param d_model: dimension of the model
@@ -144,7 +145,7 @@ class EncoderLayer(nn.Module):
 
     def __init__(self, d_model, ffn_hidden, n_head, drop_prob):
         super(EncoderLayer, self).__init__()
-        self.attention = MultiHeadAttention(d_model=d_model, n_head=n_head)
+        self.token_mixing = MultiHeadAttention(d_model=d_model, n_head=n_head)
         self.norm1 = LayerNorm(d_model=d_model)
         self.dropout1 = nn.Dropout(p=drop_prob)
 
@@ -155,7 +156,7 @@ class EncoderLayer(nn.Module):
     def forward(self, x, src_mask):
         # 1. compute self attention
         _x = x
-        x = self.attention(q=x, k=x, v=x, mask=src_mask)
+        x = self.token_mixing(q=x, k=x, v=x, mask=src_mask)
         
         # 2. add and norm
         x = self.dropout1(x)
@@ -198,8 +199,14 @@ class Model(nn.Module):
         # bin_mask: (N,5,1)
         N,L,_ = x.shape
         embedding = self.input_embedd(x,bin_mask)
-        embedding_add_cls_token = torch.cat((embedding,self.cls_token.unsqueeze(0).unsqueeze(0).repeat(N,1,1)),dim=1)
-        encode_data = embedding_add_cls_token + positionalencoding1d(self.d_model,L+6).unsqueeze(0).to(embedding_add_cls_token.device)
+        if cfg.LAST_CLS_TOKEN:
+            embedding_add_cls_token = torch.cat((embedding,self.cls_token.unsqueeze(0).unsqueeze(0).repeat(N,1,1)),dim=1)
+        else:
+            half = embedding.shape[1]//2
+            embedding_add_cls_token = torch.cat((embedding[:,:half],self.cls_token.unsqueeze(0).unsqueeze(0).repeat(N,1,1),embedding[:,half:]),dim=1)
+        encode_data = embedding_add_cls_token
+        if cfg.POSITION_ENCODING:
+            encode_data+=positionalencoding1d(self.d_model,L+6).unsqueeze(0).to(embedding_add_cls_token.device)
         for i in range(self.n_encoder):
             encode_data = self.encoder_layer[i](encode_data,None)
 
