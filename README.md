@@ -10,7 +10,7 @@ This repository contain code for honor assignment of Operating System Course.
 The traditional Round Robin scheduling is fair but can be slow due to frequent context switching with short time slices. It can also neglect short processes if the time slices are long. This research introduces a new Adaptive Round Robin algorithm that uses a deep learning technique called self-attention to automatically adjust the time slice based on what the user wants to prioritize and the current mix of processes. Early results show it can achieve 88.8% accuracy while still being fast with 3,000 FPS.
 
 
-## Implementation
+## Architecture
 
 ![](architecture.png)
 
